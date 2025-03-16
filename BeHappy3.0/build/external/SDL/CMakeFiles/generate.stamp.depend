@@ -1,0 +1,52 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-3.31/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in
+C:/Program Files/CMake/share/cmake-3.31/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CMakeDependentOption.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CMakePackageConfigHelpers.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CMakeParseArguments.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CMakePushCheckState.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CheckCCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CheckCSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CheckCSourceRuns.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CheckCXXCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CheckCXXSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CheckIncludeFile.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CheckLanguage.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CheckLibraryExists.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CheckLinkerFlag.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CheckSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CheckStructHasMember.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/CheckSymbolExists.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/FindGit.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/FindPackageHandleStandardArgs.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/FindPackageMessage.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/FindPkgConfig.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/GNUInstallDirs.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/Internal/CheckCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/Internal/CheckFlagCommonConfig.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/Internal/CheckLinkerFlag.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/Internal/CheckSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/Internal/CheckSourceRuns.cmake
+C:/Program Files/CMake/share/cmake-3.31/Modules/WriteBasicConfigVersionFile.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/build/external/SDL/CMakeFiles/SDL_build_config.h.intermediate
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/build/external/SDL/CMakeFiles/git-data/grabRef.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/.git/HEAD
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/.git/refs/heads/main
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/CMakeLists.txt
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/3rdparty.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/FindLibUSB.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/GetGitRevisionDescription.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/GetGitRevisionDescription.cmake.in
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/PreseedEmscriptenCache.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/PreseedMSVCCache.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/SDL3Config.cmake.in
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/cmake_uninstall.cmake.in
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/macros.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/sdlchecks.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/sdlcompilers.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/sdlcpu.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/sdlmanpages.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/sdlplatform.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/cmake/sdltargets.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/include/build_config/SDL_build_config.h.cmake
+C:/Users/Rocket/source/repos/BeHappy3.0/BeHappy3.0/external/SDL/include/build_config/SDL_revision.h.cmake
