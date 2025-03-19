@@ -81,7 +81,7 @@ void SignUP::RenderLaunch()
         std::string action = "Register";
         std::string message = action + "|" + username + "|" + email + "|" + password;
 
-        boost::asio::write(socket_ssl, boost::asio::buffer(message));
+        boost::asio::async_write(socket_ssl, boost::asio::buffer(message));
        
 
         char response[1024];

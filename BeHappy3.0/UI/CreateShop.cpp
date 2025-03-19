@@ -23,10 +23,28 @@ void CreateShop::Render()
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.00f, 0.20f, 0.50f, 2.50f));
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.10f, 1.20f, 1.00f, 1.00f));
    
-    ImGui::Image((ImTextureID)(intptr_t)(TextureManager::Instance().getShopImage()
+    bool IsClicked = false;
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.10f, 1.20f, 1.00f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)); // убирает задний фон кнопки 
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)); // убирает задний фон при наведении на кнопку 
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.00f, 0.0f, 0.0f, 0.00f)); // убирает задний фон при нажатии на кнопку 
+
+    if (ImGui::ImageButton("##", (ImTextureID)(intptr_t)(TextureManager::Instance().getShopImage()
         ? TextureManager::Instance().getShopImage()
         : TextureManager::Instance().GetPlaceholderTexture()),
-        ImVec2(70, 70));
+        ImVec2(70, 70)))
+    {
+        IsClicked = true;
+    }
+
+    if (IsClicked) {
+
+        WindowManager::Instance().CloseWindow("CreateShop");
+        WindowManager::Instance().OpenWindow("ShopMenu");
+
+
+    }
+    ImGui::PopStyleColor(4);
 
     if (ImGui::IsAnyItemHovered()) {
         ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
