@@ -31,6 +31,7 @@
     <ClCompile Include="src\Globals.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\TextureManager.cpp" />
+    <ClCompile Include="UI\AsyncImageClient.cpp" />
     <ClCompile Include="UI\CreateShop.cpp" />
     <ClCompile Include="UI\ErrorWindow.cpp" />
     <ClCompile Include="UI\Shop.cpp" />
@@ -55,6 +56,7 @@
     <ClInclude Include="src\ErrorManager.h" />
     <ClInclude Include="src\Globals.h" />
     <ClInclude Include="src\TextureManager.h" />
+    <ClInclude Include="UI\AsyncImageClient.h" />
     <ClInclude Include="UI\CreateShop.h" />
     <ClInclude Include="UI\ErrorWindow.h" />
     <ClInclude Include="UI\Shop.h" />
@@ -167,7 +169,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Rocket\source\repos\BeHappy3.0\BeHappy3.0\external\SDL\include;C:\Users\Rocket\src\build\lib\include;C:\Boost\include\boost-1_87;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Rocket\source\repos\BeHappy3.0\BeHappy3.0\external\SDL\include;C:\Users\Rocket\src\build\lib\include;C:\Boost\include\boost-1_87;C:\Users\Rocket\nfd\nativefiledialog\src\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/Zc:char8_t-</AdditionalOptions>
     </ClCompile>
@@ -177,7 +179,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\Rocket\SDL2Test\SDL\build\Release;C:\boost-build\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;gdi32.lib;user32.lib;SDL3.lib;SDL3_test.lib;libboost_system-vc143-mt-x64-1_87.lib;Crypt32.lib;C:\Users\Rocket\libs\libssl.lib;C:\Users\Rocket\libs\libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;gdi32.lib;user32.lib;SDL3.lib;SDL3_test.lib;libboost_system-vc143-mt-x64-1_87.lib;Crypt32.lib;C:\Users\Rocket\libs\libssl.lib;C:\Users\Rocket\libs\libcrypto.lib;C:\Users\Rocket\nfd\nativefiledialog\build\lib\Release\x64\nfd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

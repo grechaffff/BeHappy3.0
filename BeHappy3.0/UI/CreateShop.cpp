@@ -1,6 +1,8 @@
 ﻿#include"../UI/CreateShop.h"
 #include"../src/WindowManager.h"
 #include"../src/TextureManager.h"
+#include"nfd.h"
+#include"../UI/AsyncImageClient.h"
 
 CreateShop::CreateShop() : BaseWindow("CreateShop", { 0 , 0 }, { 0, 0 })
 {
@@ -88,37 +90,42 @@ void CreateShop::EnterNameShop()
 
    
     // Обработка ввода текста
-    if (ImGui::InputText("", search, sizeof(search)) && !is_typing) {
+    if (ImGui::InputText("###", search, 32)) {
         is_typing = true;  // Устанавливаем флаг, что пользователь вводит текст
-        search[0] = '\0';
+        //search[0] = '\0';
     }
     
 
     if (!is_typing && strcmp(search, "") == 0) {
         is_typing = false;
     }
-
+    
   
+
     ImGui::SetCursorPos(ImVec2(130, 385));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.00f, 0.20f, 0.50f, 2.50f));   
     ImGui::SetCursorPos(ImVec2(130, 350));
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)); // убирает задний фон кнопк
-    static std::string filename;
-
+    
    
     ImGui::SetCursorPos(ImVec2(80, 180));
     
+    boost::asio::io_context io_context;
    
+    
+
+
     ImGui::Text(u8"Add Logo");
     ImGui::PushID("LogoButton"); // для того что бы не было конфликта имен
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.00f, 0.0f, 0.0f, 0.00f));
     ImGui::SetCursorPos(ImVec2(200, 180));
     if (ImGui::Button(FOLDER)) {
-        filename = OpenFileDialog();
-        if (filename.empty()) {
-            std::cerr << "No file selected." << std::endl;
-            //return -1;
-        }
+        nfdchar_t* outpath = nullptr;
+       nfdresult_t result = NFD_OpenDialog("png,jpg", nullptr, &outpath);
+       images.emplace_back(outpath);
+
+        free(outpath);
+
     }
     ImGui::PopID();
     
@@ -126,6 +133,7 @@ void CreateShop::EnterNameShop()
     
 
     ImGui::PopStyleColor(6);
+
 
 
     ImGui::SetCursorPos(ImVec2(80, 230));
@@ -137,12 +145,26 @@ void CreateShop::EnterNameShop()
     ImGui::SetCursorPos(ImVec2(220, 230));
     ImGui::PushID("BannerButton");
     if (ImGui::Button(FOLDER)) {
-        filename = OpenFileDialog();
-        if (filename.empty()) {
-            std::cerr << "No file selected." << std::endl;
-            //return -1;
-        }
+        nfdchar_t* outpath2 = nullptr;
+        nfdresult_t result2 = NFD_OpenDialog("png,jpg", nullptr, &outpath2);
+        images.emplace_back(outpath2);
+        free(outpath2);
     }
+    
+    
+    
+   
+    
+   
+  
+
+
+   // std::vector<std::string> images = { outpath ? outpath : "", outpath2 ? outpath2 : "" };
+
+   
+
+
+
     ImGui::PopID();
     
     ImGui::PopStyleColor(3);
@@ -151,7 +173,7 @@ void CreateShop::EnterNameShop()
     ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 7.0f);
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(85.0f / 255.0f, 47.0f / 255.0f, 117.0f / 255.0f, 1.0f));
     
-
+    
    
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.00f, 0.20f, 0.50f, 2.50f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.00f, 0.20f, 0.50f, 2.50f));
@@ -175,11 +197,21 @@ void CreateShop::EnterNameShop()
         ImGui::PopStyleColor(2);
         ImGui::PopStyleVar();
     }
+    
+
     else if (strcmp(role.c_str(), "admin") == 0) {
 
         if (ImGui::Button(u8"Отправить на проверку", ImVec2(300, 35))) {
 
+            std::cout << "Отправляем изображения, количество: " << images.size() << std::endl;
+            for (const auto& img : images) {
+                std::cout << "Путь: " << img << std::endl;
+            }
 
+            auto client = std::make_shared<AsyncImageClient>(io_context, "127.0.0.1", 7272, search, images);
+            client->Start("127.0.0.1", 7272); // Вызываем старт уже после создания shared_ptr
+
+           io_context.run();
 
         }
 

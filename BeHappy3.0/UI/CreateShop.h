@@ -18,7 +18,7 @@ public:
 	static CreateShop& Instance();
 
 private:
-
+	std::vector<std::string> images;
 
 	static std::string input;
 	static char search[128];
