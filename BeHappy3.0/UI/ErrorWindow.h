@@ -14,6 +14,8 @@ public:
 	static ErrorWindow& Instance();
 	void MessageError(std::string& message);
 
+	static bool authentication;
+
 private:
 	
 	

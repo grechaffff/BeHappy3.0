@@ -143,6 +143,7 @@ void SignIN::RenderLaunch() {
         else if (server_response == "Login Successfull") {
             WindowManager::Instance().CloseWindow("SignIN");
             std::cout << "Login Successful." << std::endl;
+            ErrorWindow::authentication = true;
             WindowManager::Instance().OpenWindow("ShopMenu");
         }
         else {

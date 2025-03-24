@@ -1,4 +1,5 @@
 #include "ErrorWindow.h"
+#include"../src/WindowManager.h"
 
 void ErrorWindow::Render()
 {
@@ -16,6 +17,44 @@ void ErrorWindow::Render()
     ImGui::SetCursorPos(ImVec2(200, 170));
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.00f, 0.20f, 0.50f, 2.50f));
     ImGui::Text("x");
+
+    bool IsClicked = false;
+
+    if (ImGui::IsAnyItemHovered()) {
+        ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+    }
+    else {
+        ImGui::SetMouseCursor(ImGuiMouseCursor_Arrow);
+    }
+
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.10f, 1.20f, 1.00f, 0.00f));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)); // убирает задний фон кнопки 
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.0f, 0.0f)); // убирает задний фон при наведении на кнопку 
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.00f, 0.0f, 0.0f, 0.00f)); // убирает задний фон при нажатии на кнопку 
+    ImGui::SetCursorPos(ImVec2(10, 5));
+    if (ImGui::ImageButton("", (ImTextureID)(intptr_t)(TextureManager::Instance().getShopImage()
+        ? TextureManager::Instance().getShopImage()
+        : TextureManager::Instance().GetPlaceholderTexture()),
+        ImVec2(70, 70)))
+    {
+        IsClicked = true;
+    }
+
+    if (IsClicked) {
+
+
+        WindowManager::Instance().CloseWindow("authServer");
+        if (authentication == true) {
+            WindowManager::Instance().OpenWindow("ShopMenu");
+
+        }
+        else if (authentication == false) {
+
+            WindowManager::Instance().OpenWindow("SignUP");
+        }
+
+    }
+    ImGui::PopStyleColor(4);
 
     MessageError(ErrorMessage);
     ImGui::SetCursorPos(ImVec2(75, 120));
@@ -63,3 +102,5 @@ void ErrorWindow::MessageError(std::string& message)
 }
 
 std::string ErrorWindow::ErrorMessage;
+
+bool ErrorWindow::authentication = false;

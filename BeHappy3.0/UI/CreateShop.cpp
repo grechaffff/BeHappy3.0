@@ -3,6 +3,7 @@
 #include"../src/TextureManager.h"
 #include"nfd.h"
 #include"../UI/AsyncImageClient.h"
+#include"../UI/ErrorWindow.h"
 
 CreateShop::CreateShop() : BaseWindow("CreateShop", { 0 , 0 }, { 0, 0 })
 {
@@ -122,9 +123,21 @@ void CreateShop::EnterNameShop()
     if (ImGui::Button(FOLDER)) {
         nfdchar_t* outpath = nullptr;
        nfdresult_t result = NFD_OpenDialog("png,jpg", nullptr, &outpath);
-       images.emplace_back(outpath);
+       if (result == NFD_OKAY) {
+           images.emplace_back(outpath);
+           free(outpath);
+           std::cout << "Файл выбран N1" << std::endl;
+       }
+       else if (result == NFD_CANCEL) {
+           std::string data = u8"Логотип не выбран";
+           std::cout << "Файл не выбран N1" << std::endl;
+           ErrorWindow::Instance().ErrorMessage = data;
+           WindowManager::Instance().CloseWindow("CreateShop");
+           WindowManager::Instance().OpenWindow("authServer");
 
-        free(outpath);
+           free(outpath);
+       }
+      
 
     }
     ImGui::PopID();
@@ -147,8 +160,20 @@ void CreateShop::EnterNameShop()
     if (ImGui::Button(FOLDER)) {
         nfdchar_t* outpath2 = nullptr;
         nfdresult_t result2 = NFD_OpenDialog("png,jpg", nullptr, &outpath2);
-        images.emplace_back(outpath2);
-        free(outpath2);
+        if (result2 == NFD_OKAY) {
+            images.emplace_back(outpath2);
+            free(outpath2);
+            std::cout << "Файл выбран N2" << std::endl;
+        }
+        else if (result2 == NFD_CANCEL) {
+            std::string data = u8"Баннер не выбран";
+            std::cout << "Файл не выбран N1" << std::endl;
+            ErrorWindow::Instance().ErrorMessage = data;
+            WindowManager::Instance().CloseWindow("CreateShop");
+            WindowManager::Instance().OpenWindow("authServer");
+            free(outpath2);
+        }
+       
     }
     
     
@@ -207,11 +232,21 @@ void CreateShop::EnterNameShop()
             for (const auto& img : images) {
                 std::cout << "Путь: " << img << std::endl;
             }
+            if (strcmp(search, "") == 0) {
+                std::cout << u8"Enter store name:" << std::endl;
+                std::string data = u8"Введите название магазина:";
+                WindowManager::Instance().CloseWindow("CreateShop");
+                WindowManager::Instance().CloseWindow("ShopMenu");
+                ErrorWindow::Instance().ErrorMessage = data;
+                WindowManager::Instance().OpenWindow("authServer");
+            }
+            else {
+                auto client = std::make_shared<AsyncImageClient>(io_context, "127.0.0.1", 7272, search, images);
+                client->Start("127.0.0.1", 7272); // Вызываем старт уже после создания shared_ptr
 
-            auto client = std::make_shared<AsyncImageClient>(io_context, "127.0.0.1", 7272, search, images);
-            client->Start("127.0.0.1", 7272); // Вызываем старт уже после создания shared_ptr
-
-           io_context.run();
+                io_context.run();
+            }
+           
 
         }
 

@@ -37,6 +37,7 @@ void AsyncImageClient::send_store_name()
         boost::asio::bind_executor(strand_,
             [self = shared_from_this()](boost::system::error_code ec, std::size_t) {
                 if (!ec) {
+                    
                     std::cout << "Отправлено название магазина: " << self->store_name_ << "\n";
                     self->send_next_image();
                 }
@@ -44,13 +45,14 @@ void AsyncImageClient::send_store_name()
                     std::cerr << "Ошибка отправки названия магазина: " << ec.message() << "\n";
                 }
             }));
-
+   
 }
 
 void AsyncImageClient::send_next_image()
 {
     if (image_index_ >= image_files_.size()) {
         std::cout << "Все изображения отправлены.\n";
+        
         return;
     }
 
