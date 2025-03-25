@@ -13,7 +13,6 @@ public:
     void Start(const std::string& host, int port);
 
 private:
-
     boost::asio::ip::tcp::socket socket_;
     boost::asio::ip::tcp::resolver resolver_;
     boost::asio::strand<boost::asio::any_io_executor> strand_;
@@ -23,7 +22,13 @@ private:
     size_t image_index_;
     std::vector<char> buffer_;
 
+    uint32_t store_server_length_;
+
     void send_store_name();
+
+    void read_server_message_length();
+
+    void read_server_message();
 
     void send_next_image();
 };

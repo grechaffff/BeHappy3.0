@@ -37,9 +37,9 @@ void AsyncImageClient::send_store_name()
         boost::asio::bind_executor(strand_,
             [self = shared_from_this()](boost::system::error_code ec, std::size_t) {
                 if (!ec) {
-                    
                     std::cout << "Отправлено название магазина: " << self->store_name_ << "\n";
                     self->send_next_image();
+
                 }
                 else {
                     std::cerr << "Ошибка отправки названия магазина: " << ec.message() << "\n";
@@ -48,13 +48,59 @@ void AsyncImageClient::send_store_name()
    
 }
 
+void AsyncImageClient::read_server_message_length()
+{
+    auto self(shared_from_this());
+    boost::asio::async_read(socket_, boost::asio::buffer(&store_server_length_, sizeof(store_server_length_)),
+        [this, self](boost::system::error_code ec, std::size_t length) {
+            if (!ec && length == sizeof(store_server_length_)) {
+                store_server_length_ = ntohl(store_server_length_);
+                // std::cout << "Получена длина ответа от сервера: " << store_server_length_ << "\n";
+                read_server_message();
+            }
+            else {
+                std::cerr << "Ошибка при чтении длины ответа: " << ec.message() << "\n";
+            }
+        });
+}
+
+void AsyncImageClient::read_server_message()
+{
+    auto self(shared_from_this());
+    store_name_.resize(store_server_length_);
+
+    boost::asio::async_read(socket_, boost::asio::buffer(store_name_),
+        [this, self](boost::system::error_code ec, std::size_t length) {
+            if (!ec && length == store_server_length_) {
+                std::cout << "Ответ от сервера: " << store_name_ << "\n";
+            }
+            else {
+                std::cerr << "Ошибка при чтении данных: " << ec.message() << "\n";
+            }
+        });
+
+}
+
 void AsyncImageClient::send_next_image()
 {
     if (image_index_ >= image_files_.size()) {
         std::cout << "Все изображения отправлены.\n";
-        
+
+        uint32_t zero = htonl(0);
+        boost::asio::async_write(socket_, boost::asio::buffer(&zero, sizeof(zero)),
+            boost::asio::bind_executor(strand_,
+                [self = shared_from_this()](boost::system::error_code ec, std::size_t) {
+                    if (!ec) {
+                        //std::cout << "Маркер завершения отправлен.\n";
+                        self->read_server_message_length();
+                    }
+                    else {
+                        std::cerr << "Ошибка отправки маркера завершения: " << ec.message() << "\n";
+                    }
+                }));
         return;
     }
+
 
     std::ifstream file(image_files_[image_index_], std::ios::binary | std::ios::ate);
     if (!file) {
