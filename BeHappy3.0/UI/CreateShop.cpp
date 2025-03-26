@@ -115,18 +115,20 @@ void CreateShop::EnterNameShop()
    
     
 
+    static bool buttonDisabledLogo = false;
 
     ImGui::Text(u8"Add Logo");
     ImGui::PushID("LogoButton"); // для того что бы не было конфликта имен
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.00f, 0.0f, 0.0f, 0.00f));
     ImGui::SetCursorPos(ImVec2(200, 180));
-    if (ImGui::Button(FOLDER)) {
+    if (!buttonDisabledLogo && ImGui::Button(FOLDER)) {
         nfdchar_t* outpath = nullptr;
        nfdresult_t result = NFD_OpenDialog("png,jpg", nullptr, &outpath);
        if (result == NFD_OKAY) {
            images.emplace_back(outpath);
            free(outpath);
            std::cout << "Файл выбран N1" << std::endl;
+           buttonDisabledLogo = true;
        }
        else if (result == NFD_CANCEL) {
            std::string data = u8"Логотип не выбран";
@@ -142,7 +144,11 @@ void CreateShop::EnterNameShop()
     }
     ImGui::PopID();
     
-    
+    if (buttonDisabledLogo) {
+        ImGui::BeginDisabled();
+        ImGui::Button(FOLDER);
+        ImGui::EndDisabled();
+    }
     
 
     ImGui::PopStyleColor(6);
@@ -151,19 +157,22 @@ void CreateShop::EnterNameShop()
 
     ImGui::SetCursorPos(ImVec2(80, 230));
 
+    static bool buttonDisabledBanner = false;
+
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.00f, 0.0f, 0.0f, 0.00f));
     ImGui::Text(u8"Add Banner");   
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.00f, 0.20f, 0.50f, 2.50f));   
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
     ImGui::SetCursorPos(ImVec2(220, 230));
     ImGui::PushID("BannerButton");
-    if (ImGui::Button(FOLDER)) {
+    if (!buttonDisabledBanner && ImGui::Button(FOLDER)) {
         nfdchar_t* outpath2 = nullptr;
         nfdresult_t result2 = NFD_OpenDialog("png,jpg", nullptr, &outpath2);
         if (result2 == NFD_OKAY) {
             images.emplace_back(outpath2);
             free(outpath2);
             std::cout << "Файл выбран N2" << std::endl;
+            buttonDisabledBanner = true;
         }
         else if (result2 == NFD_CANCEL) {
             std::string data = u8"Баннер не выбран";
@@ -175,7 +184,11 @@ void CreateShop::EnterNameShop()
         }
        
     }
-    
+    if (buttonDisabledBanner) {
+        ImGui::BeginDisabled();
+        ImGui::Button(FOLDER);
+        ImGui::EndDisabled();
+    }
     
     
    
@@ -224,6 +237,7 @@ void CreateShop::EnterNameShop()
     }
     
 
+
     else if (strcmp(role.c_str(), "admin") == 0) {
 
         if (ImGui::Button(u8"Отправить на проверку", ImVec2(300, 35))) {
@@ -231,6 +245,19 @@ void CreateShop::EnterNameShop()
             std::cout << "Отправляем изображения, количество: " << images.size() << std::endl;
             for (const auto& img : images) {
                 std::cout << "Путь: " << img << std::endl;
+            }
+            if (images.size() == 0 || images.size() == 1) {
+
+                std::cout << "Добавьте изображение магазина:" << std::endl;
+                std::string data = u8"Добавьте изображение магазина:";
+                WindowManager::Instance().CloseWindow("CreateShop");
+                WindowManager::Instance().CloseWindow("ShopMenu");
+                ErrorWindow::Instance().ErrorMessage = data;
+                WindowManager::Instance().OpenWindow("authServer");
+                ImGui::PopStyleVar();
+                ImGui::PopStyleColor(3);
+                return;
+
             }
             if (strcmp(search, "") == 0) {
                 std::cout << u8"Enter store name:" << std::endl;
@@ -242,11 +269,15 @@ void CreateShop::EnterNameShop()
             }
             else {
                 auto client = std::make_shared<AsyncImageClient>(io_context, "127.0.0.1", 7272, search, images);
+
                 client->Start("127.0.0.1", 7272); // Вызываем старт уже после создания shared_ptr
 
                 io_context.run();
+
+
             }
            
+          
 
         }
 

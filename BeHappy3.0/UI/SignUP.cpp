@@ -33,16 +33,46 @@ void SignUP::RenderUsernameInput(char* username)
 
 
     ImGui::InputText("###", username, 32);
+
+    ImVec2 p_min = ImGui::GetItemRectMin();
+    ImVec2 p_max = ImGui::GetItemRectMax();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+
+    ImU32 borderColor = IM_COL32(255, 105, 180, 255);
+
+
+    float thickness = 1.0f;
+
+    // Рисуем рамку
+    draw_list->AddRect(p_min, p_max, borderColor, 0.0f, 0, thickness);
+
 }
 
 void SignUP::RenderEmailInput(char* email)
 {
+    ImGui::SetNextItemWidth(250);
     ImGui::SetCursorPos(ImVec2(70, 230));
-    ImGui::SetNextItemWidth(250);
+   
+
+    ImGui::PushID("Email");
+    ImGui::InputText("##", email, 32);
+   
+
+    ImVec2 p_min = ImGui::GetItemRectMin();
+    ImVec2 p_max = ImGui::GetItemRectMax();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
 
-    ImGui::InputText(" ##", email, 32);
-    ImGui::SetNextItemWidth(250);
+    ImU32 borderColor = IM_COL32(255, 105, 180, 255);
+
+
+    float thickness = 1.0f;
+
+    // Рисуем рамку
+    draw_list->AddRect(p_min, p_max, borderColor, 0.0f, 0, thickness);
+
+    ImGui::PopID();
 }
 
 void SignUP::RenderPasswordInput(char* password)
@@ -51,6 +81,20 @@ void SignUP::RenderPasswordInput(char* password)
     ImGui::SetCursorPos(ImVec2(70, 300));
     ImGui::SetNextItemWidth(250);
     ImGui::InputText("##", password, 32, ImGuiInputTextFlags_Password);
+
+    ImVec2 p_min = ImGui::GetItemRectMin();
+    ImVec2 p_max = ImGui::GetItemRectMax();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+
+    ImU32 borderColor = IM_COL32(255, 105, 180, 255);
+
+
+    float thickness = 1.0f;
+
+    // Рисуем рамку
+    draw_list->AddRect(p_min, p_max, borderColor, 0.0f, 0, thickness);
+
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.00f, 0.20f, 0.50f, 2.50f));
 
 }
@@ -81,7 +125,7 @@ void SignUP::RenderLaunch()
         std::string action = "Register";
         std::string message = action + "|" + username + "|" + email + "|" + password;
 
-        boost::asio::async_write(socket_ssl, boost::asio::buffer(message));
+        boost::asio::write(socket_ssl, boost::asio::buffer(message));
        
 
         char response[1024];

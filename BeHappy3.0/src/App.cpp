@@ -163,12 +163,12 @@ void App::Run() {
 
 	manager.AddWindow("authServer", WindowError);
 
-	manager.AddWindow("SignIN", signInWindow);
+	//manager.AddWindow("SignIN", signInWindow);
 
-	manager.AddWindow("SignUP", signUpWindow);
+	//manager.AddWindow("SignUP", signUpWindow);
 
 	auto shopMenu = std::make_shared<Shop>(manager);
-	shopMenu->IsOpen = false;
+	shopMenu->IsOpen = true;
 	manager.AddWindow("ShopMenu", shopMenu);
 
 	auto userInfo = std::make_shared<UserInfo>();

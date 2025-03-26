@@ -1,6 +1,7 @@
 #include "AsyncImageClient.h"
 #include<fstream>
-
+#include"../src/WindowManager.h"
+#include"../UI/ErrorWindow.h"
 AsyncImageClient::AsyncImageClient(boost::asio::io_context& io_context, const std::string& host, int port,
     const std::string& store_name, const std::vector<std::string>& image_files)
     : socket_(io_context), resolver_(io_context), strand_(boost::asio::make_strand(io_context)),
@@ -24,6 +25,8 @@ void AsyncImageClient::Start(const std::string& host, int port)
             }));
 
 }
+
+
 
 void AsyncImageClient::send_store_name()
 {
@@ -73,6 +76,16 @@ void AsyncImageClient::read_server_message()
         [this, self](boost::system::error_code ec, std::size_t length) {
             if (!ec && length == store_server_length_) {
                 std::cout << "Ответ от сервера: " << store_name_ << "\n";
+                if (strcmp(store_name_.c_str(), "Successfull") == 0) {
+
+                    std::cout << store_name_ << std::endl;
+                    std::string data = store_name_;
+                    WindowManager::Instance().CloseWindow("CreateShop");
+                    WindowManager::Instance().CloseWindow("ShopMenu");
+                    ErrorWindow::Instance().ErrorMessage = data;
+                    WindowManager::Instance().OpenWindow("authServer");
+
+                }
             }
             else {
                 std::cerr << "Ошибка при чтении данных: " << ec.message() << "\n";

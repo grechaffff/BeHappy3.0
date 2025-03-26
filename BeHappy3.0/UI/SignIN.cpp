@@ -39,6 +39,21 @@ void SignIN::RenderUsernameInput(char* username) {
 
 
     ImGui::InputText("###", username, 32);
+   
+
+    // Получаем координаты InputText
+    ImVec2 p_min = ImGui::GetItemRectMin();
+    ImVec2 p_max = ImGui::GetItemRectMax();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    // Цвет и толщина обводки
+    ImU32 borderColor = IM_COL32(255, 105, 180, 255);
+
+    //ImU32 borderColor = IM_COL32(255, 105, 180, 255);
+    float thickness = 1.0f;
+
+    // Рисуем рамку
+    draw_list->AddRect(p_min, p_max, borderColor, 0.0f, 0, thickness);
 
 
 }
@@ -48,6 +63,21 @@ void SignIN::RenderPasswordInput(char* password) {
     ImGui::SetCursorPos(ImVec2(70, 230));
     ImGui::SetNextItemWidth(250);
     ImGui::InputText("##", password, 32, ImGuiInputTextFlags_Password);
+
+
+    ImVec2 p_min = ImGui::GetItemRectMin();
+    ImVec2 p_max = ImGui::GetItemRectMax();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+     
+     ImU32 borderColor = IM_COL32(255, 105, 180, 255);
+
+   
+    float thickness = 1.0f;
+
+    // Рисуем рамку
+    draw_list->AddRect(p_min, p_max, borderColor, 0.0f, 0, thickness);
+
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.00f, 0.20f, 0.50f, 2.50f));
 
 }

@@ -12,6 +12,13 @@ public:
 
     void Start(const std::string& host, int port);
 
+    static AsyncImageClient& instance();
+
+    std::string get_Name_store() {
+
+        return store_name_;
+    }
+
 private:
     boost::asio::ip::tcp::socket socket_;
     boost::asio::ip::tcp::resolver resolver_;

@@ -130,6 +130,18 @@ void Shop::CreateInput()
         search[0] = '\0';
     }
 
+    ImVec2 p_min = ImGui::GetItemRectMin();
+    ImVec2 p_max = ImGui::GetItemRectMax();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+
+    ImU32 borderColor = IM_COL32(255, 0, 255, 255);
+
+
+    float thickness = 1.0f;
+
+    // Рисуем рамку
+    draw_list->AddRect(p_min, p_max, borderColor, 0.0f, 0, thickness);
 
 
     if (!is_typing && strcmp(search, "") == 0) {
