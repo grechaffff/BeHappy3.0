@@ -2,22 +2,23 @@
 #include<fstream>
 #include"../src/WindowManager.h"
 #include"../UI/ErrorWindow.h"
-AsyncImageClient::AsyncImageClient(boost::asio::io_context& io_context, const std::string& host, int port,
+
+AsyncImageClient::AsyncImageClient(boost::asio::io_context& io_context, const std::string& host, int port,  unsigned int id ,
     const std::string& store_name, const std::vector<std::string>& image_files)
     : socket_(io_context), resolver_(io_context), strand_(boost::asio::make_strand(io_context)),
-    store_name_(store_name), image_files_(image_files), image_index_(0) {
+    store_name_(store_name), image_files_(image_files), image_index_(0) , userID(id) {
 }
 
-void AsyncImageClient::Start(const std::string& host, int port)
+void AsyncImageClient::Start(const std::string& host, int port , unsigned int userID)
 {
     auto self = shared_from_this(); // Теперь безопасно, так как объект уже в shared_ptr
     boost::asio::ip::tcp::resolver::results_type endpoints = resolver_.resolve(host, std::to_string(port));
 
     boost::asio::async_connect(socket_, endpoints,
         boost::asio::bind_executor(strand_,
-            [self](boost::system::error_code ec, boost::asio::ip::tcp::endpoint) {
+            [self , userID](boost::system::error_code ec, boost::asio::ip::tcp::endpoint) {
                 if (!ec) {
-                    self->send_store_name();
+                    self->send_store_name(userID);
                 }
                 else {
                     std::cerr << "Ошибка подключения: " << ec.message() << "\n";
@@ -28,21 +29,31 @@ void AsyncImageClient::Start(const std::string& host, int port)
 
 
 
-void AsyncImageClient::send_store_name()
+void AsyncImageClient::send_store_name(unsigned int userID)
 {
-    uint32_t name_length = htonl(store_name_.size());
-    buffer_.resize(sizeof(name_length) + store_name_.size());
+    uint32_t name_length = htonl(store_name_.size());  // Длина имени магазина (4 байта)
+    uint32_t store_id = htonl(userID);  // Конвертируем id в сетевой порядок (4 байта)
 
-    std::memcpy(buffer_.data(), &name_length, sizeof(name_length));
-    std::memcpy(buffer_.data() + sizeof(name_length), store_name_.data(), store_name_.size());
+    // Новый буфер: 4 байта (id) + 4 байта (длина имени) + само имя
+    buffer_.resize(sizeof(store_id) + sizeof(name_length) + store_name_.size());
 
+    // Копируем ID магазина в буфер
+    std::memcpy(buffer_.data(), &store_id, sizeof(store_id));
+
+    // Копируем длину имени
+    std::memcpy(buffer_.data() + sizeof(store_id), &name_length, sizeof(name_length));
+
+    // Копируем само имя магазина
+    std::memcpy(buffer_.data() + sizeof(store_id) + sizeof(name_length), store_name_.data(), store_name_.size());
+
+    // Отправляем данные
     boost::asio::async_write(socket_, boost::asio::buffer(buffer_),
         boost::asio::bind_executor(strand_,
             [self = shared_from_this()](boost::system::error_code ec, std::size_t) {
                 if (!ec) {
-                    std::cout << "Отправлено название магазина: " << self->store_name_ << "\n";
+                    std::cout << "Отправлено название магазина: " << self->store_name_
+                        << " (ID: " << self->userID << ")\n";
                     self->send_next_image();
-
                 }
                 else {
                     std::cerr << "Ошибка отправки названия магазина: " << ec.message() << "\n";

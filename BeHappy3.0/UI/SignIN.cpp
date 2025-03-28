@@ -125,13 +125,21 @@ void SignIN::RenderLaunch() {
         // Разделяем строку по '|'
         std::string server_response;
         std::string user_role;
+        std::string id;
         size_t delimiter = res.find('|');
+       
         if (delimiter != std::string::npos) {
-            server_response = res.substr(0, delimiter);  // До '|'
-            user_role = res.substr(delimiter + 1);      // После '|'
+            size_t second_delimiter = res.find('|' ,  delimiter + 1);
+            
+            if (second_delimiter != std::string::npos) {
+                server_response = res.substr(0, delimiter);  // До первого '|'
+                user_role = res.substr(delimiter + 1, second_delimiter - delimiter - 1);  // Между двумя '|'
+                id = res.substr(second_delimiter + 1);  // После второго '|'
 
-            std::cout << "Server Response: " << server_response << std::endl;
-            std::cout << "User Role: " << user_role << std::endl;
+                std::cout << "Server Response: " << server_response << std::endl;
+                std::cout << "User Role: " << user_role << std::endl;
+                std::cout << "UserID:" << id << std::endl;
+            }
         }
         else {
             server_response = res;
@@ -151,7 +159,9 @@ void SignIN::RenderLaunch() {
         // Сохраняем пользователя
         UserInfo::Instance().user = username;
         CreateShop::Instance().role = user_role;
+        CreateShop::Instance().userID = stoi(id);
         
+
         // Проверяем ответ сервера
         if (server_response == "username and password empty") {
             WindowManager::Instance().CloseWindow("SignIN");

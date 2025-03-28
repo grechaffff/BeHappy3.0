@@ -6,11 +6,11 @@ class AsyncImageClient : public std::enable_shared_from_this<AsyncImageClient>
 
 public:
 
-    AsyncImageClient(boost::asio::io_context& io_context, const std::string& host, int port,
+    AsyncImageClient(boost::asio::io_context& io_context, const std::string& host, int port,  unsigned int id ,
         const std::string& store_name, const std::vector<std::string>& image_files);
 
 
-    void Start(const std::string& host, int port);
+    void Start(const std::string& host, int port , unsigned int userID);
 
     static AsyncImageClient& instance();
 
@@ -29,9 +29,10 @@ private:
     size_t image_index_;
     std::vector<char> buffer_;
 
+    unsigned int userID;
     uint32_t store_server_length_;
 
-    void send_store_name();
+    void send_store_name(unsigned int userID);
 
     void read_server_message_length();
 

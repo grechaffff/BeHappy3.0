@@ -212,7 +212,7 @@ void CreateShop::EnterNameShop()
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(85.0f / 255.0f, 47.0f / 255.0f, 117.0f / 255.0f, 1.0f));
     
     
-   
+    static bool buttonSendShop = false;
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(1.00f, 0.20f, 0.50f, 2.50f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.00f, 0.20f, 0.50f, 2.50f));
     if (strcmp(role.c_str(), "user") == 0) {
@@ -229,7 +229,8 @@ void CreateShop::EnterNameShop()
            
             ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(u8"Доступно только администраторам").x) / 2);
             ImGui::SetTooltip(u8"Доступно только администраторам");
-          
+            
+
             
         }
         ImGui::PopStyleColor(2);
@@ -240,7 +241,7 @@ void CreateShop::EnterNameShop()
 
     else if (strcmp(role.c_str(), "admin") == 0) {
 
-        if (ImGui::Button(u8"Отправить на проверку", ImVec2(300, 35))) {
+        if (!buttonSendShop && ImGui::Button(u8"Отправить на проверку", ImVec2(300, 35))) {
 
             std::cout << "Отправляем изображения, количество: " << images.size() << std::endl;
             for (const auto& img : images) {
@@ -268,9 +269,10 @@ void CreateShop::EnterNameShop()
                 WindowManager::Instance().OpenWindow("authServer");
             }
             else {
-                auto client = std::make_shared<AsyncImageClient>(io_context, "127.0.0.1", 7272, search, images);
+                auto client = std::make_shared<AsyncImageClient>(io_context, "127.0.0.1", 7272, userID , search, images );
 
-                client->Start("127.0.0.1", 7272); // Вызываем старт уже после создания shared_ptr
+                client->Start("127.0.0.1", 7272 , userID); // Вызываем старт уже после создания shared_ptr
+                buttonSendShop = true;
 
                 io_context.run();
 
@@ -279,6 +281,29 @@ void CreateShop::EnterNameShop()
            
           
 
+        }
+        if (buttonSendShop) {
+            ImGui::BeginDisabled();
+
+            ImGui::PushStyleVar(ImGuiStyleVar_PopupRounding, 10.0f);
+            ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0.1f, 0.1f, 0.1f, 1.0f)); // Темный фон
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.5f, 0.0f, 1.0f));    //
+                     
+          
+            ImGui::Button(u8"Отправить на проверку");
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal)) {
+
+               
+                ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(u8"Ваш магазин в обработке").x) / 2);
+                ImGui::SetTooltip(u8"Ваш магазин в обработке");
+
+
+
+            }
+            ImGui::EndDisabled();
+            ImGui::PopStyleColor(2);
+            ImGui::PopStyleVar();
+            
         }
 
     }
@@ -316,3 +341,4 @@ void CreateShop::EnterNameShop()
 std::string CreateShop::input = "Enter a name";
 char CreateShop::search[128] = "";
 std::string CreateShop::role;
+int CreateShop::userID;

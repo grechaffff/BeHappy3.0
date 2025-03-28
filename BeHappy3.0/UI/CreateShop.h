@@ -14,6 +14,7 @@ public:
 	void EnterNameShop();
 	std::string OpenFileDialog();
 	static std::string role;
+	static int userID;
 
 	static CreateShop& Instance();
 
@@ -23,4 +24,5 @@ private:
 	static std::string input;
 	static char search[128];
 	bool is_typing = false;
+	
 };
