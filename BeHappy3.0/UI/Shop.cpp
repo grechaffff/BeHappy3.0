@@ -18,7 +18,9 @@ Shop::Shop(WindowManager& manager)
 
 void Shop::Render() {
 
-   
+    
+
+
     if (!IsOpen) return;
     //SDL_SetWindowSize(window, 800, 600);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.05f, 0.06f, 0.07f, 1.00));
@@ -43,6 +45,40 @@ void Shop::Render() {
         : TextureManager::Instance().GetPlaceholderTexture()),
         ImVec2(70, 70));
 
+    float imageSize = 160.0f;
+    float padding = 70.0f;
+
+    float totalWidth = ImGui::GetContentRegionAvail().x;
+
+    // ¬ычисл€ем, сколько изображений поместитс€ в строку
+    int imagesPerRow = static_cast<int>((totalWidth + padding) / (imageSize + padding));
+    if (imagesPerRow < 1) imagesPerRow = 1;
+
+    // ¬ычисл€ем ширину строки из изображений + отступов между ними
+    float rowWidth = imagesPerRow * imageSize + (imagesPerRow - 1) * padding;
+
+    // ÷ентрируем строку по горизонтали (оставл€ем одинаковый отступ слева и справа)
+    float leftOffset = (totalWidth - rowWidth) * 0.5f;
+    if (leftOffset < 0.0f) leftOffset = 0.0f; // Ќа вс€кий случай
+
+    // ќтступ сверху, если нужно (можно убрать SetCursorPos если не нужен вертикальный отступ)
+    ImGui::SetCursorPosY(160.0f);
+
+    for (size_t i = 0; i < imageMemoryList.size(); ++i) {
+        // ѕереход на новую строку и установка отступа слева
+        if (i % imagesPerRow == 0) {
+            if (i != 0)
+                ImGui::NewLine();
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + leftOffset);
+        }
+
+        ImGui::Image(imageMemoryList[i], ImVec2(imageSize, imageSize));
+
+        if ((i + 1) % imagesPerRow != 0)
+            ImGui::SameLine(0.0f, padding);
+    }
+
+
     
 
     RemoveBackground();
@@ -65,6 +101,7 @@ void Shop::Render() {
 
 
     ClearImGui();
+   
 }
 
 

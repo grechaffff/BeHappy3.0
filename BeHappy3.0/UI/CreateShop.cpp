@@ -97,6 +97,20 @@ void CreateShop::EnterNameShop()
     }
     
 
+    ImVec2 p_min = ImGui::GetItemRectMin();
+    ImVec2 p_max = ImGui::GetItemRectMax();
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+
+     ImU32 borderColor = IM_COL32(221, 160, 221 , 255);
+   
+
+    float thickness = 2.0f;
+
+    // Рисуем рамку
+    draw_list->AddRect(p_min, p_max, borderColor, 0.0f, 0, thickness);
+
+
     if (!is_typing && strcmp(search, "") == 0) {
         is_typing = false;
     }
@@ -176,7 +190,7 @@ void CreateShop::EnterNameShop()
         }
         else if (result2 == NFD_CANCEL) {
             std::string data = u8"Баннер не выбран";
-            std::cout << "Файл не выбран N1" << std::endl;
+            std::cout << "Файл не выбран N2" << std::endl;
             ErrorWindow::Instance().ErrorMessage = data;
             WindowManager::Instance().CloseWindow("CreateShop");
             WindowManager::Instance().OpenWindow("authServer");
@@ -269,12 +283,8 @@ void CreateShop::EnterNameShop()
                 WindowManager::Instance().OpenWindow("authServer");
             }
             else {
-                auto client = std::make_shared<AsyncImageClient>(io_context, "127.0.0.1", 7272, userID , search, images );
-
-                client->Start("127.0.0.1", 7272 , userID); // Вызываем старт уже после создания shared_ptr
-                buttonSendShop = true;
-
-                io_context.run();
+               
+                // Вызвать отправку создания магазина 
 
 
             }
@@ -338,7 +348,7 @@ void CreateShop::EnterNameShop()
 
 
 
-std::string CreateShop::input = "Enter a name";
+std::string CreateShop::input = "Enter store names";
 char CreateShop::search[128] = "";
 std::string CreateShop::role;
 int CreateShop::userID;

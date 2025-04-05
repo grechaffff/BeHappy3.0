@@ -15,8 +15,11 @@ bool moving;
 boost::asio::io_context io_context;
 boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket_ssl(io_context , ctx);
 
+GLuint imageMemoryShop = 0;
 
+//std::shared_ptr<AsyncImageClient> client = nullptr;
 
+std::vector<GLuint > imageMemoryList;
 constexpr float imageWidth = 70.0f;
 constexpr float imageHeight = 70.0f;
 

@@ -3,57 +3,90 @@
 #include"../src/WindowManager.h"
 #include"../UI/ErrorWindow.h"
 
-AsyncImageClient::AsyncImageClient(boost::asio::io_context& io_context, const std::string& host, int port,  unsigned int id ,
-    const std::string& store_name, const std::vector<std::string>& image_files)
-    : socket_(io_context), resolver_(io_context), strand_(boost::asio::make_strand(io_context)),
-    store_name_(store_name), image_files_(image_files), image_index_(0) , userID(id) {
+
+
+
+void AsyncImageClient::Start(const std::string& host, int port)
+{
+    auto self = shared_from_this();
+    resolver_.async_resolve(host, std::to_string(port),
+        [this, self](boost::system::error_code ec, boost::asio::ip::tcp::resolver::results_type endpoints) {
+            if (!ec) {
+                boost::asio::async_connect(socket_, endpoints,
+                    boost::asio::bind_executor(strand_,
+                        [this, self](boost::system::error_code ec, boost::asio::ip::tcp::endpoint) {
+                            if (!ec) {
+                                std::cout << "Connect succesfull:" << std::endl;
+                                receive_image_count();
+                            }
+                            else {
+                                std::cerr << "Ошибка подключения: " << ec.message() << "\n";
+                            }
+                        }));
+            }
+            else {
+                std::cerr << "Ошибка резолвинга: " << ec.message() << "\n";
+            }
+        });
+
 }
 
-void AsyncImageClient::Start(const std::string& host, int port , unsigned int userID)
+void AsyncImageClient::SendStoreInfo(const std::string& store_name, const std::vector<std::string>& image_files, unsigned int user_id)
 {
-    auto self = shared_from_this(); // Теперь безопасно, так как объект уже в shared_ptr
-    boost::asio::ip::tcp::resolver::results_type endpoints = resolver_.resolve(host, std::to_string(port));
+    store_name_ = store_name;
+    image_files_ = image_files;
+    userID = user_id;
+    image_index_ = 0;
+    auto self = shared_from_this();
+    uint8_t cmd = 1;
 
-    boost::asio::async_connect(socket_, endpoints,
+    // Сначала отправляем команду
+    boost::asio::async_write(socket_, boost::asio::buffer(&cmd, sizeof(cmd)),
         boost::asio::bind_executor(strand_,
-            [self , userID](boost::system::error_code ec, boost::asio::ip::tcp::endpoint) {
+            [this, self](boost::system::error_code ec, std::size_t) {
                 if (!ec) {
-                    self->send_store_name(userID);
+                    std::cout << "Команда 1 (создание магазина) отправлена\n";
+                    // Потом — отправка данных магазина
+                    send_store_name();
                 }
                 else {
-                    std::cerr << "Ошибка подключения: " << ec.message() << "\n";
+                    std::cerr << "Ошибка при отправке команды: " << ec.message() << "\n";
                 }
             }));
 
+
+}
+
+void AsyncImageClient::SendImages()
+{
+    std::cout << "SendImages:" << std::endl;
+    auto self = shared_from_this();
+    boost::asio::post(strand_, [this, self]() {
+        send_next_image();
+        });
+
 }
 
 
 
-void AsyncImageClient::send_store_name(unsigned int userID)
+void AsyncImageClient::send_store_name()
 {
-    uint32_t name_length = htonl(store_name_.size());  // Длина имени магазина (4 байта)
-    uint32_t store_id = htonl(userID);  // Конвертируем id в сетевой порядок (4 байта)
+    uint32_t name_length = htonl(store_name_.size());
+    uint32_t store_id = htonl(userID);
 
-    // Новый буфер: 4 байта (id) + 4 байта (длина имени) + само имя
     buffer_.resize(sizeof(store_id) + sizeof(name_length) + store_name_.size());
-
-    // Копируем ID магазина в буфер
     std::memcpy(buffer_.data(), &store_id, sizeof(store_id));
-
-    // Копируем длину имени
     std::memcpy(buffer_.data() + sizeof(store_id), &name_length, sizeof(name_length));
-
-    // Копируем само имя магазина
     std::memcpy(buffer_.data() + sizeof(store_id) + sizeof(name_length), store_name_.data(), store_name_.size());
 
-    // Отправляем данные
+    auto self(shared_from_this());
     boost::asio::async_write(socket_, boost::asio::buffer(buffer_),
         boost::asio::bind_executor(strand_,
-            [self = shared_from_this()](boost::system::error_code ec, std::size_t) {
+            [this, self](boost::system::error_code ec, std::size_t) {
                 if (!ec) {
-                    std::cout << "Отправлено название магазина: " << self->store_name_
-                        << " (ID: " << self->userID << ")\n";
-                    self->send_next_image();
+                    std::cout << "Отправлено название магазина: " << store_name_ << "\n";
+                    SendImages();
+                    //send_next_image();
                 }
                 else {
                     std::cerr << "Ошибка отправки названия магазина: " << ec.message() << "\n";
@@ -61,7 +94,7 @@ void AsyncImageClient::send_store_name(unsigned int userID)
             }));
    
 }
-
+/*
 void AsyncImageClient::read_server_message_length()
 {
     auto self(shared_from_this());
@@ -77,7 +110,23 @@ void AsyncImageClient::read_server_message_length()
             }
         });
 }
+*/
+void AsyncImageClient::read_server_message()
+{
+    auto self(shared_from_this());
+    boost::asio::async_read(socket_, boost::asio::buffer(buffer_, 10),
+        [this, self](boost::system::error_code ec, std::size_t length) {
+            if (!ec) {
+                std::string message(buffer_.begin(), buffer_.begin() + length);
+                std::cout << "Ответ сервера: " << message << "\n";
+            }
+            else {
+                std::cerr << "Ошибка чтения ответа сервера: " << ec.message() << "\n";
+            }
+        });
 
+}
+/*
 void AsyncImageClient::read_server_message()
 {
     auto self(shared_from_this());
@@ -104,6 +153,8 @@ void AsyncImageClient::read_server_message()
         });
 
 }
+*/
+
 
 void AsyncImageClient::send_next_image()
 {
@@ -111,12 +162,12 @@ void AsyncImageClient::send_next_image()
         std::cout << "Все изображения отправлены.\n";
 
         uint32_t zero = htonl(0);
+        auto self(shared_from_this());
         boost::asio::async_write(socket_, boost::asio::buffer(&zero, sizeof(zero)),
             boost::asio::bind_executor(strand_,
-                [self = shared_from_this()](boost::system::error_code ec, std::size_t) {
+                [this, self](boost::system::error_code ec, std::size_t) {
                     if (!ec) {
-                        //std::cout << "Маркер завершения отправлен.\n";
-                        self->read_server_message_length();
+                        read_server_message();
                     }
                     else {
                         std::cerr << "Ошибка отправки маркера завершения: " << ec.message() << "\n";
@@ -125,12 +176,11 @@ void AsyncImageClient::send_next_image()
         return;
     }
 
-
     std::ifstream file(image_files_[image_index_], std::ios::binary | std::ios::ate);
     if (!file) {
         std::cerr << "Ошибка: не удалось открыть файл " << image_files_[image_index_] << "\n";
         image_index_++;
-        send_next_image();  // Пропускаем файл и переходим к следующему
+        send_next_image();
         return;
     }
 
@@ -142,20 +192,98 @@ void AsyncImageClient::send_next_image()
     std::memcpy(buffer_.data(), &net_size, sizeof(net_size));
     file.read(buffer_.data() + sizeof(net_size), file_size);
 
+    auto self(shared_from_this());
     boost::asio::async_write(socket_, boost::asio::buffer(buffer_),
         boost::asio::bind_executor(strand_,
-            [self = shared_from_this()](boost::system::error_code ec, std::size_t) {
+            [this, self](boost::system::error_code ec, std::size_t) {
                 if (!ec) {
-                    std::cout << "Отправлено изображение: " << self->image_files_[self->image_index_] << "\n";
-                    self->image_index_++;
-                    self->send_next_image();
+                    std::cout << "Отправлено изображение: " << image_files_[image_index_] << "\n";
+                    image_index_++;
+                    send_next_image();
                 }
                 else {
                     std::cerr << "Ошибка отправки изображения: " << ec.message() << "\n";
                 }
             }));
+}
+
+
+void AsyncImageClient::receive_image_count()
+{
+    auto self(shared_from_this());
+    boost::asio::async_read(socket_, boost::asio::buffer(&image_count_, sizeof(image_count_)),
+        boost::asio::bind_executor(strand_,
+            [this, self](boost::system::error_code ec, std::size_t length) {
+                if (!ec && length == sizeof(image_count_)) {
+                    image_count_ = ntohl(image_count_);
+                    std::cout << "Сервер отправит " << image_count_ << " изображений\n";
+                    if (image_count_ > 0) {
+                        receive_next_image();
+                    }
+                    else {
+
+                        // send_store_name();
+                    }
+                }
+                else {
+                    std::cerr << "Ошибка чтения количества изображений: " << ec.message() << "\n";
+                }
+            }));
 
 }
+
+void AsyncImageClient::receive_next_image()
+{
+    if (image_count_ == 0) {
+        // send_store_name();
+        return;
+    }
+
+    auto self(shared_from_this());
+    boost::asio::async_read(socket_, boost::asio::buffer(&image_size_, sizeof(image_size_)),
+        boost::asio::bind_executor(strand_,
+            [this, self](boost::system::error_code ec, std::size_t length) {
+                if (!ec && length == sizeof(image_size_)) {
+                    image_size_ = ntohl(image_size_);
+                    buffer_.resize(image_size_);
+                    receive_image_data();
+                }
+                else {
+                    std::cerr << "Ошибка получения размера изображения: " << ec.message() << "\n";
+                }
+            }));
+}
+
+void AsyncImageClient::receive_image_data()
+{
+    auto self(shared_from_this());
+    boost::asio::async_read(socket_, boost::asio::buffer(buffer_),
+        boost::asio::bind_executor(strand_,
+            [this, self](boost::system::error_code ec, std::size_t length) {
+                if (!ec && length == buffer_.size()) {
+                    //save_image();
+                    std::vector< unsigned char > image_data(buffer_.begin(), buffer_.end());
+                    TextureManager& txManager = TextureManager::Instance();
+                    imageMemoryShop = txManager.LoadTextureFromMemory(image_data);
+
+
+                    imageMemoryList.push_back(imageMemoryShop);
+
+
+
+                    std::cout << "Изображение загружено в память, размер: " << image_data.size() << " байт\n";
+
+                    image_count_--;
+                    receive_next_image();
+                }
+                else {
+                    std::cerr << "Ошибка при получении изображения: " << ec.message() << "\n";
+                }
+            }));
+
+}
+
+
 
 
 

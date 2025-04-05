@@ -21,6 +21,14 @@ public:
 
     static TextureManager& Instance();
 
+   
+
+    GLuint LoadTextureFromMemory(std::vector<unsigned char > dataImage);
+
+
+   
+
+
     GLuint getShopImage() const;
 
     void SetShopImage(GLuint texture);
@@ -29,6 +37,7 @@ private:
 
 	std::unordered_map<std::string, GLuint> textureCache;
 	GLuint placeholderTexture = 0;
+
 
 
     GLuint CreatePlaceholderTexture(int width = 256, int height = 256, ImVec4 color = ImVec4(0.06f, 0.06f, 0.06f, 0.00f));

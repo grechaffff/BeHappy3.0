@@ -22,14 +22,18 @@
 #include<boost/bind/bind.hpp>
 #include<boost/asio/ssl.hpp>
 #include "TextureManager.h"
-
+#include"../UI/AsyncImageClient.h"
 
 
 // Удаляем #include "WindowManager.h", чтобы избежать зацикливания
 // Удаляем #include "SignUP.h", чтобы избежать зацикливания
 
+extern  GLuint imageMemoryShop;
+
+//extern std::shared_ptr<AsyncImageClient> client;
 
 
+extern std::vector<GLuint > imageMemoryList;
 
 extern ImFont* font2;
 extern ImFont* font3;

@@ -8,6 +8,7 @@
 #include"../UI/ErrorWindow.h"
 #include"../UI/CreateShop.h"
 #include"../UI/ShopManager.h"
+#include"../UI/AsyncImageClient.h"
 
 enum class AppState
 {
@@ -144,6 +145,12 @@ void App::Run() {
 	else {
 		state = AppState::Error;
 	}
+
+	auto client = std::make_shared<AsyncImageClient>(io_context);
+	client->Start("127.0.0.1", 7272);
+
+	io_context.run();
+
 
 	WindowManager& manager = WindowManager::Instance();
 
